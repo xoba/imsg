@@ -9,4 +9,12 @@ var (
 	ErrMissingRecipient = errors.New("imsg: recipient is required")
 	// ErrEmptyMessage is returned when both text and attachments are empty.
 	ErrEmptyMessage = errors.New("imsg: message text or attachments required")
+	// ErrScriptTimeout is returned when AppleScript execution exceeds the timeout.
+	ErrScriptTimeout = errors.New("imsg: osascript timeout")
+	// ErrAttachmentPathEmpty is returned when an attachment path is empty.
+	ErrAttachmentPathEmpty = errors.New("imsg: attachment path is empty")
+	// ErrAttachmentIsDirectory is returned when an attachment path is a directory.
+	ErrAttachmentIsDirectory = errors.New("imsg: attachment is a directory")
+	// ErrUnsupportedTildePath is returned when a tilde path cannot be expanded.
+	ErrUnsupportedTildePath = errors.New("imsg: unsupported tilde path")
 )

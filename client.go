@@ -132,7 +132,7 @@ func (c *Client) execAppleScript(script string) error {
 	trimmed := strings.TrimSpace(string(output))
 
 	if errors.Is(ctx.Err(), context.DeadlineExceeded) {
-		return fmt.Errorf("imsg: osascript timeout after %s", c.ScriptTimeout)
+		return fmt.Errorf("%w: %s", ErrScriptTimeout, c.ScriptTimeout)
 	}
 
 	if err != nil {
@@ -162,7 +162,7 @@ func normalizeAttachments(paths []string) ([]attachmentInfo, []func() error, err
 	for _, path := range paths {
 		trimmed := strings.TrimSpace(path)
 		if trimmed == "" {
-			return nil, nil, fmt.Errorf("imsg: attachment path is empty")
+			return nil, nil, ErrAttachmentPathEmpty
 		}
 
 		expanded, err := expandHome(trimmed)
@@ -184,7 +184,7 @@ func normalizeAttachments(paths []string) ([]attachmentInfo, []func() error, err
 		}
 		if info.IsDir() {
 			runCleanups(cleanups, false)
-			return nil, nil, fmt.Errorf("imsg: attachment %q is a directory", trimmed)
+			return nil, nil, fmt.Errorf("%w: %s", ErrAttachmentIsDirectory, trimmed)
 		}
 
 		if needsSandboxBypass(absolute) {
@@ -219,7 +219,7 @@ func expandHome(path string) (string, error) {
 	}
 
 	if strings.HasPrefix(path, "~") {
-		return "", fmt.Errorf("imsg: unsupported tilde path %q", path)
+		return "", fmt.Errorf("%w: %s", ErrUnsupportedTildePath, path)
 	}
 
 	return path, nil
@@ -255,8 +255,8 @@ func copyToPictures(path string) (string, func() error, error) {
 	}
 
 	picturesDir := filepath.Join(home, "Pictures")
-	if err := os.MkdirAll(picturesDir, 0700); err != nil {
-		return "", nil, fmt.Errorf("imsg: ensure Pictures directory: %w", err)
+	if mkErr := os.MkdirAll(picturesDir, 0700); mkErr != nil {
+		return "", nil, fmt.Errorf("imsg: ensure Pictures directory: %w", mkErr)
 	}
 
 	pattern := tempPatternFor(path)
@@ -270,28 +270,31 @@ func copyToPictures(path string) (string, func() error, error) {
 		return os.Remove(tempPath)
 	}
 
+	// #nosec G304 -- path is user-supplied and validated by caller.
 	source, err := os.Open(path)
 	if err != nil {
-		tempFile.Close()
-		cleanup()
+		_ = tempFile.Close()
+		_ = cleanup()
 		return "", nil, fmt.Errorf("imsg: open attachment %q: %w", path, err)
 	}
-	defer source.Close()
+	defer func() {
+		_ = source.Close()
+	}()
 
 	if _, err := io.Copy(tempFile, source); err != nil {
-		tempFile.Close()
-		cleanup()
+		_ = tempFile.Close()
+		_ = cleanup()
 		return "", nil, fmt.Errorf("imsg: copy attachment %q: %w", path, err)
 	}
 
 	if err := tempFile.Chmod(0600); err != nil {
-		tempFile.Close()
-		cleanup()
+		_ = tempFile.Close()
+		_ = cleanup()
 		return "", nil, fmt.Errorf("imsg: secure temp attachment: %w", err)
 	}
 
 	if err := tempFile.Close(); err != nil {
-		cleanup()
+		_ = cleanup()
 		return "", nil, fmt.Errorf("imsg: finalize temp attachment: %w", err)
 	}
 

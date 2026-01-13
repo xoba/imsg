@@ -60,6 +60,7 @@ linters:
           list-mode: original
           allow:
             - "$gostd"
+            - "xoba.com/imsg"
             - "xoba.com/imsg/"
     funlen:
       lines: 120
