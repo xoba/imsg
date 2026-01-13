@@ -61,7 +61,6 @@ linters:
           allow:
             - "$gostd"
             - "xoba.com/imsg"
-            - "xoba.com/imsg/"
     funlen:
       lines: 120
       statements: 80
