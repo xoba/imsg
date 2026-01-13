@@ -1,0 +1,87 @@
+version: "2"
+
+run:
+  timeout: 5m
+  tests: true
+
+linters:
+  default: none
+
+  enable:
+    # Core - essential static analysis
+    - govet        # reports suspicious constructs
+    - staticcheck  # comprehensive static analysis
+    - ineffassign  # detects ineffectual assignments
+    - unused       # finds unused code
+
+    # Bugs & error handling
+    - errcheck     # unchecked errors
+    - errorlint    # error wrapping issues
+    - err113       # dynamic vs static errors
+    - nilerr       # returning nil error after checking err != nil
+    - nilnil       # returning nil,nil from functions
+    - nilnesserr   # nil-ness related issues
+    - bodyclose    # unclosed HTTP response bodies
+    - contextcheck # context propagation issues
+    - copyloopvar  # loop variable capture (Go 1.22+)
+
+    # Security
+    - gosec        # security issues
+
+    # Complexity & design
+    - cyclop       # cyclomatic complexity
+    - gocognit     # cognitive complexity
+    - funlen       # function length
+    - nestif       # nested if complexity
+    - gocritic     # opinionated style checks
+    - revive       # fast, configurable linter
+    - unparam      # unused function parameters
+
+    # Dependencies
+    - depguard     # allowed/blocked imports
+    - gomodguard   # module allow/block lists
+
+    # Tests & meta
+    - paralleltest # missing t.Parallel()
+    - nolintlint   # ill-formed nolint directives
+
+  settings:
+    copyloopvar:
+      check-alias: true
+
+    cyclop:
+      max-complexity: 15
+
+    depguard:
+      rules:
+        main:
+          files:
+            - "$all"
+          list-mode: original
+          allow:
+            - "$gostd"
+            - "xoba.com/imsg/"
+    funlen:
+      lines: 120
+      statements: 80
+
+    gocritic:
+      disabled-checks: []
+
+    govet:
+      enable-all: true
+      disable:
+        - fieldalignment  # optimization only, not correctness
+
+    nestif:
+      min-complexity: 4
+
+    nolintlint:
+      require-explanation: true
+      allow-unused: false
+
+    revive:
+      enable-default-rules: true
+      rules:
+        - name: exported
+          severity: warning
