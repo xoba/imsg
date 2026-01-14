@@ -150,11 +150,10 @@ go run ./cmd/send-chat-demo -chat-id "iMessage;+;chat1234567890" -text "hello gr
 Attachments outside `~/Pictures`, `~/Downloads`, or `~/Documents` are copied to a temporary file in `~/Pictures` so Messages can access them. The temporary file is deleted after the send completes.
 
 ## Public API
-
-- `Version`
 - `Message`
-- `Client`, `NewClient`, `WithTimeout`, `WithDebug`
-- `Send`, `SendText`, `SendFile`, `SendFiles`, `SendChatID`
+- `Client` (fields: `ScriptTimeout`, `Debug`; methods: `Send`, `SendText`, `SendFile`, `SendFiles`, `SendChatID`)
+- `Option`, `NewClient`, `DefaultClient`, `WithTimeout`, `WithDebug`
+- Package helpers: `Send`, `SendText`, `SendFile`, `SendFiles`, `SendChatID`
 - `LookupChatIDsByName`
 - Exported errors: `ErrUnsupportedOS`, `ErrMissingRecipient`, `ErrMissingChatID`, `ErrMissingChatName`, `ErrEmptyMessage`, `ErrScriptTimeout`, `ErrAttachmentPathEmpty`, `ErrAttachmentIsDirectory`, `ErrUnsupportedTildePath`
 
