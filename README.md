@@ -84,12 +84,61 @@ func main() {
 }
 ```
 
+Send directly with a known chat ID:
+
+```go
+package main
+
+import "xoba.com/imsg"
+
+func main() {
+    _ = imsg.SendChatID("iMessage;+;chat1234567890", imsg.Message{
+        Text: "hello group",
+    })
+}
+```
+
+Send a file to a group chat:
+
+```go
+package main
+
+import "xoba.com/imsg"
+
+func main() {
+    _ = imsg.SendChatID("iMessage;+;chat1234567890", imsg.Message{
+        Text: "see attached",
+        Attachments: []string{
+            "/path/to/file.pdf",
+        },
+    })
+}
+```
+
 ## CLI
 
 A simple sender lives in `cmd/send-demo`:
 
 ```bash
 go run ./cmd/send-demo -to "+12025550123" -text "hello" -file "/path/to/file.png"
+```
+
+Lookup chat IDs by name:
+
+```bash
+go run ./cmd/lookup-demo -name "project team"
+```
+
+Example output:
+
+```text
+iMessage;+;chat1234567890
+```
+
+Send to a chat ID:
+
+```bash
+go run ./cmd/send-chat-demo -chat-id "iMessage;+;chat1234567890" -text "hello group"
 ```
 
 ## Requirements
