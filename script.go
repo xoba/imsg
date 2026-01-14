@@ -35,6 +35,30 @@ func buildSendScript(recipient, text string, attachments []attachmentInfo) strin
 	return b.String()
 }
 
+func buildSendChatScript(chatID, text string, attachments []attachmentInfo) string {
+	escapedChatID := escapeAppleScriptString(chatID)
+
+	var b strings.Builder
+	b.WriteString("tell application \"Messages\"\n")
+	b.WriteString(fmt.Sprintf("    set targetChat to chat id \"%s\"\n", escapedChatID))
+
+	for _, attachment := range attachments {
+		escapedPath := escapeAppleScriptString(attachment.Path)
+		b.WriteString(fmt.Sprintf("    send POSIX file \"%s\" to targetChat\n", escapedPath))
+		if attachment.DelaySecond > 0 {
+			b.WriteString(fmt.Sprintf("    delay %d\n", attachment.DelaySecond))
+		}
+	}
+
+	if text != "" {
+		escapedText := escapeAppleScriptString(text)
+		b.WriteString(fmt.Sprintf("    send \"%s\" to targetChat\n", escapedText))
+	}
+
+	b.WriteString("end tell")
+	return b.String()
+}
+
 func escapeAppleScriptString(value string) string {
 	replacer := strings.NewReplacer(
 		"\\", "\\\\",

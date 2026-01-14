@@ -56,6 +56,34 @@ func main() {
 }
 ```
 
+## Group chats
+
+Look up chat IDs by name, then send to the chat ID:
+
+```go
+package main
+
+import (
+    "log"
+
+    "xoba.com/imsg"
+)
+
+func main() {
+    chatIDs, err := imsg.LookupChatIDsByName("stonks")
+    if err != nil {
+        log.Fatal(err)
+    }
+    if len(chatIDs) == 0 {
+        log.Fatal("no matching chats")
+    }
+
+    _ = imsg.SendChatID(chatIDs[0], imsg.Message{
+        Text: "hello group",
+    })
+}
+```
+
 ## CLI
 
 A simple sender lives in `cmd/send-demo`:
@@ -68,6 +96,7 @@ go run ./cmd/send-demo -to "+12025550123" -text "hello" -file "/path/to/file.png
 
 - macOS with Messages.app signed in to iMessage
 - Allow your terminal/IDE to control Messages when macOS prompts (Privacy & Security -> Automation)
+- Grant Full Disk Access if you use `LookupChatIDsByName` (Privacy & Security -> Full Disk Access)
 
 Attachments outside `~/Pictures`, `~/Downloads`, or `~/Documents` are copied to a temporary file in `~/Pictures` so Messages can access them. The temporary file is deleted after the send completes.
 
@@ -76,8 +105,9 @@ Attachments outside `~/Pictures`, `~/Downloads`, or `~/Documents` are copied to 
 - `Version`
 - `Message`
 - `Client`, `NewClient`, `WithTimeout`, `WithDebug`
-- `Send`, `SendText`, `SendFile`, `SendFiles`
-- Exported errors: `ErrUnsupportedOS`, `ErrMissingRecipient`, `ErrEmptyMessage`, `ErrScriptTimeout`, `ErrAttachmentPathEmpty`, `ErrAttachmentIsDirectory`, `ErrUnsupportedTildePath`
+- `Send`, `SendText`, `SendFile`, `SendFiles`, `SendChatID`
+- `LookupChatIDsByName`
+- Exported errors: `ErrUnsupportedOS`, `ErrMissingRecipient`, `ErrMissingChatID`, `ErrMissingChatName`, `ErrEmptyMessage`, `ErrScriptTimeout`, `ErrAttachmentPathEmpty`, `ErrAttachmentIsDirectory`, `ErrUnsupportedTildePath`
 
 ## How it works
 

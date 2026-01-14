@@ -61,6 +61,7 @@ linters:
           allow:
             - "$gostd"
             - "xoba.com/imsg"
+            - "github.com/mattn/go-sqlite3"
     funlen:
       lines: 120
       statements: 80

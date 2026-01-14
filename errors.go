@@ -9,6 +9,10 @@ var (
 	ErrMissingRecipient = errors.New("imsg: recipient is required")
 	// ErrEmptyMessage is returned when both text and attachments are empty.
 	ErrEmptyMessage = errors.New("imsg: message text or attachments required")
+	// ErrMissingChatID is returned when the chat id is empty.
+	ErrMissingChatID = errors.New("imsg: chat id is required")
+	// ErrMissingChatName is returned when the chat name is empty.
+	ErrMissingChatName = errors.New("imsg: chat name is required")
 	// ErrScriptTimeout is returned when AppleScript execution exceeds the timeout.
 	ErrScriptTimeout = errors.New("imsg: osascript timeout")
 	// ErrAttachmentPathEmpty is returned when an attachment path is empty.

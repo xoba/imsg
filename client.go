@@ -78,6 +78,11 @@ func SendFiles(to string, paths []string, text string) error {
 	return DefaultClient.SendFiles(to, paths, text)
 }
 
+// SendChatID sends a message to a chat id using the default client.
+func SendChatID(chatID string, msg Message) error {
+	return DefaultClient.SendChatID(chatID, msg)
+}
+
 // Send sends a message to a recipient.
 func (c *Client) Send(to string, msg Message) error {
 	if runtime.GOOS != "darwin" {
@@ -117,6 +122,32 @@ func (c *Client) SendFile(to, path string) error {
 // SendFiles sends multiple attachments with optional text.
 func (c *Client) SendFiles(to string, paths []string, text string) error {
 	return c.Send(to, Message{Text: text, Attachments: paths})
+}
+
+// SendChatID sends a message to a chat id.
+func (c *Client) SendChatID(chatID string, msg Message) error {
+	if runtime.GOOS != "darwin" {
+		return ErrUnsupportedOS
+	}
+
+	if strings.TrimSpace(chatID) == "" {
+		return ErrMissingChatID
+	}
+
+	trimmedText := strings.TrimSpace(msg.Text)
+
+	attachments, cleanups, err := normalizeAttachments(msg.Attachments)
+	if err != nil {
+		return err
+	}
+	defer runCleanups(cleanups, c.Debug)
+
+	if trimmedText == "" && len(attachments) == 0 {
+		return ErrEmptyMessage
+	}
+
+	script := buildSendChatScript(chatID, msg.Text, attachments)
+	return c.execAppleScript(script)
 }
 
 func (c *Client) execAppleScript(script string) error {
