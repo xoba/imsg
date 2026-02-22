@@ -1,0 +1,1 @@
+Go library for sending iMessages on macOS.
