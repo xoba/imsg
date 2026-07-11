@@ -290,15 +290,23 @@ func copyToPictures(path string) (string, func() error, error) {
 		return "", nil, fmt.Errorf("imsg: ensure Pictures directory: %w", mkErr)
 	}
 
-	pattern := tempPatternFor(path)
-	tempFile, err := os.CreateTemp(picturesDir, pattern)
+	// Uniqueness lives in the directory name so the file keeps its original
+	// basename, which is what the recipient sees in Messages.
+	tempDir, err := os.MkdirTemp(picturesDir, ".imsg_temp_")
 	if err != nil {
-		return "", nil, fmt.Errorf("imsg: create temp attachment: %w", err)
+		return "", nil, fmt.Errorf("imsg: create temp attachment directory: %w", err)
 	}
-	tempPath := tempFile.Name()
 
 	cleanup := func() error {
-		return os.Remove(tempPath)
+		return os.RemoveAll(tempDir)
+	}
+
+	tempPath := filepath.Join(tempDir, filepath.Base(path))
+	// #nosec G304 -- tempPath is derived from a validated attachment basename.
+	tempFile, err := os.OpenFile(tempPath, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0600)
+	if err != nil {
+		_ = cleanup()
+		return "", nil, fmt.Errorf("imsg: create temp attachment: %w", err)
 	}
 
 	// #nosec G304 -- path is user-supplied and validated by caller.
@@ -318,59 +326,12 @@ func copyToPictures(path string) (string, func() error, error) {
 		return "", nil, fmt.Errorf("imsg: copy attachment %q: %w", path, err)
 	}
 
-	if err := tempFile.Chmod(0600); err != nil {
-		_ = tempFile.Close()
-		_ = cleanup()
-		return "", nil, fmt.Errorf("imsg: secure temp attachment: %w", err)
-	}
-
 	if err := tempFile.Close(); err != nil {
 		_ = cleanup()
 		return "", nil, fmt.Errorf("imsg: finalize temp attachment: %w", err)
 	}
 
 	return tempPath, cleanup, nil
-}
-
-func tempPatternFor(path string) string {
-	ext := filepath.Ext(path)
-	base := strings.TrimSuffix(filepath.Base(path), ext)
-
-	safeBase := sanitizeSegment(base, 60)
-	safeExt := sanitizeSegment(ext, 10)
-	if safeExt == "." {
-		safeExt = ""
-	}
-
-	if safeBase == "" {
-		return "imsg_temp_*" + safeExt
-	}
-	return "imsg_temp_" + safeBase + "_*" + safeExt
-}
-
-func sanitizeSegment(value string, maxLen int) string {
-	if maxLen <= 0 {
-		return ""
-	}
-	var b strings.Builder
-	for _, r := range value {
-		if b.Len() >= maxLen {
-			break
-		}
-		switch {
-		case r >= 'a' && r <= 'z':
-			b.WriteRune(r)
-		case r >= 'A' && r <= 'Z':
-			b.WriteRune(r)
-		case r >= '0' && r <= '9':
-			b.WriteRune(r)
-		case r == '.' || r == '_' || r == '-':
-			b.WriteRune(r)
-		default:
-			b.WriteByte('_')
-		}
-	}
-	return b.String()
 }
 
 func runCleanups(cleanups []func() error, debug bool) {

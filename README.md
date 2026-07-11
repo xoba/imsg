@@ -147,7 +147,7 @@ go run ./cmd/send-chat-demo -chat-id "iMessage;+;chat1234567890" -text "hello gr
 - Allow your terminal/IDE to control Messages when macOS prompts (Privacy & Security -> Automation)
 - Grant Full Disk Access if you use `LookupChatIDsByName` (Privacy & Security -> Full Disk Access)
 
-Attachments outside `~/Pictures`, `~/Downloads`, or `~/Documents` are copied to a temporary file in `~/Pictures` so Messages can access them. The temporary file is deleted after the send completes.
+Attachments outside `~/Pictures`, `~/Downloads`, or `~/Documents` are copied into a hidden temporary directory in `~/Pictures` so Messages can access them. The file keeps its original name (which is what the recipient sees), and the temporary directory is deleted after the send completes.
 
 ## Public API
 - `Message`
