@@ -16,19 +16,19 @@ func buildSendScript(recipient, text string, attachments []attachmentInfo) strin
 	var b strings.Builder
 	b.WriteString("tell application \"Messages\"\n")
 	b.WriteString("    set targetService to 1st service whose service type is iMessage and enabled is true\n")
-	b.WriteString(fmt.Sprintf("    set targetBuddy to buddy \"%s\" of targetService\n", escapedRecipient))
+	fmt.Fprintf(&b, "    set targetBuddy to buddy \"%s\" of targetService\n", escapedRecipient)
 
 	for _, attachment := range attachments {
 		escapedPath := escapeAppleScriptString(attachment.Path)
-		b.WriteString(fmt.Sprintf("    send POSIX file \"%s\" to targetBuddy\n", escapedPath))
+		fmt.Fprintf(&b, "    send POSIX file \"%s\" to targetBuddy\n", escapedPath)
 		if attachment.DelaySecond > 0 {
-			b.WriteString(fmt.Sprintf("    delay %d\n", attachment.DelaySecond))
+			fmt.Fprintf(&b, "    delay %d\n", attachment.DelaySecond)
 		}
 	}
 
 	if text != "" {
 		escapedText := escapeAppleScriptString(text)
-		b.WriteString(fmt.Sprintf("    send \"%s\" to targetBuddy\n", escapedText))
+		fmt.Fprintf(&b, "    send \"%s\" to targetBuddy\n", escapedText)
 	}
 
 	b.WriteString("end tell")
@@ -40,19 +40,19 @@ func buildSendChatScript(chatID, text string, attachments []attachmentInfo) stri
 
 	var b strings.Builder
 	b.WriteString("tell application \"Messages\"\n")
-	b.WriteString(fmt.Sprintf("    set targetChat to chat id \"%s\"\n", escapedChatID))
+	fmt.Fprintf(&b, "    set targetChat to chat id \"%s\"\n", escapedChatID)
 
 	for _, attachment := range attachments {
 		escapedPath := escapeAppleScriptString(attachment.Path)
-		b.WriteString(fmt.Sprintf("    send POSIX file \"%s\" to targetChat\n", escapedPath))
+		fmt.Fprintf(&b, "    send POSIX file \"%s\" to targetChat\n", escapedPath)
 		if attachment.DelaySecond > 0 {
-			b.WriteString(fmt.Sprintf("    delay %d\n", attachment.DelaySecond))
+			fmt.Fprintf(&b, "    delay %d\n", attachment.DelaySecond)
 		}
 	}
 
 	if text != "" {
 		escapedText := escapeAppleScriptString(text)
-		b.WriteString(fmt.Sprintf("    send \"%s\" to targetChat\n", escapedText))
+		fmt.Fprintf(&b, "    send \"%s\" to targetChat\n", escapedText)
 	}
 
 	b.WriteString("end tell")

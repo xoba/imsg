@@ -1,3 +1,4 @@
+// Command send-chat-demo sends an iMessage to an existing chat by chat ID.
 package main
 
 import (

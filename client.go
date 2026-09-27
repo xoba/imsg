@@ -158,7 +158,7 @@ func (c *Client) execAppleScript(script string) error {
 		fmt.Fprintf(os.Stderr, "imsg: executing AppleScript:\n%s\n", script)
 	}
 
-	cmd := exec.CommandContext(ctx, "osascript", "-e", script)
+	cmd := exec.CommandContext(ctx, "osascript", "-e", script) //nolint:gosec // fixed binary; script inputs are escaped in script.go
 	output, err := cmd.CombinedOutput()
 	trimmed := strings.TrimSpace(string(output))
 

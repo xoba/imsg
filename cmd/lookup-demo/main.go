@@ -1,3 +1,4 @@
+// Command lookup-demo prints iMessage chat IDs whose display name matches -name.
 package main
 
 import (

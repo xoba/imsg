@@ -1,3 +1,4 @@
+// Command send-demo sends an iMessage to a phone number or email address.
 package main
 
 import (

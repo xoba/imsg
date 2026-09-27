@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/mattn/go-sqlite3" // registers the sqlite3 driver for database/sql
 )
 
 const messagesDBRelativePath = "Library/Messages/chat.db"

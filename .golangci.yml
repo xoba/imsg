@@ -39,7 +39,7 @@ linters:
 
     # Dependencies
     - depguard     # allowed/blocked imports
-    - gomodguard   # module allow/block lists
+    - gomodguard_v2 # module allow/block lists
 
     # Tests & meta
     - paralleltest # missing t.Parallel()
